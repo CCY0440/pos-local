@@ -1,0 +1,66 @@
+{
+  "name": "pos-local",
+  "version": "1.0.0",
+  "description": "餐廳 QR Code 點餐 POS 系統",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "server": "node server/server.js",
+    "build:win": "electron-builder --win",
+    "build:mac": "electron-builder --mac",
+    "create-icon": "node build/create-icon.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "multer": "^1.4.5-lts.1",
+    "sql.js": "^1.6.2",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "electron": "^28.3.3",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.poslocal.restaurant",
+    "productName": "POS點餐系統",
+    "copyright": "Copyright © 2025",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "server/**/*",
+      "!server/data/**/*",
+      "!server/node_modules/**/*"
+    ],
+    "extraResources": [
+      { "from": "public", "to": "public" },
+      { "from": "node_modules/sql.js/dist/sql-wasm.wasm", "to": "sql-wasm.wasm" },
+      { "from": "build/icon.png", "to": "icon.png" }
+    ],
+    "win": {
+      "target": [{ "target": "nsis", "arch": ["x64"] }],
+      "icon": "build/icon.ico"
+    },
+    "mac": {
+      "target": [{ "target": "dmg", "arch": ["x64", "arm64"] }],
+      "icon": "build/icon.icns",
+      "category": "public.app-category.business"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "POS點餐系統",
+      "installerLanguages": ["zh_TW"],
+      "language": "1028"
+    },
+    "dmg": {
+      "title": "POS點餐系統 安裝"
+    }
+  }
+}
