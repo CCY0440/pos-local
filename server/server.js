@@ -14,10 +14,12 @@ const os = require('os');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const DATA_DIR = path.join(__dirname, 'data');
+const DATA_DIR = process.env.POS_DATA_DIR
+  ? path.join(process.env.POS_DATA_DIR, 'data')
+  : path.join(__dirname, 'data');
 const DB_FILE = path.join(DATA_DIR, 'restaurant.db');
 const UPLOADS_DIR = path.join(DATA_DIR, 'uploads');
-const PUBLIC_DIR = path.join(__dirname, '..', 'public');
+const PUBLIC_DIR = process.env.POS_PUBLIC_DIR || path.join(__dirname, '..', 'public');
 
 // ── 目錄確保存在 ──────────────────────────────
 fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -783,7 +785,9 @@ app.get('/api/server-ip', async (req, res) => {
 
 async function start() {
   console.log('🔄 初始化資料庫...');
-  const wasmBinary = fs.readFileSync(path.join(__dirname, 'node_modules', 'sql.js', 'dist', 'sql-wasm.wasm'));
+  const wasmPath = process.env.POS_WASM_PATH
+    || path.join(__dirname, 'node_modules', 'sql.js', 'dist', 'sql-wasm.wasm');
+  const wasmBinary = fs.readFileSync(wasmPath);
 const SQL = await initSqlJs({ wasmBinary });
 
   if (fs.existsSync(DB_FILE)) {
@@ -806,4 +810,8 @@ const SQL = await initSqlJs({ wasmBinary });
   });
 }
 
-start().catch(console.error);
+if (require.main === module) {
+  start().catch(console.error);
+} else {
+  module.exports = { start, app, PORT };
+}
