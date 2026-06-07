@@ -786,7 +786,7 @@ app.get('/api/server-ip', async (req, res) => {
 async function start() {
   console.log('🔄 初始化資料庫...');
   const wasmPath = process.env.POS_WASM_PATH
-    || path.join(__dirname, 'node_modules', 'sql.js', 'dist', 'sql-wasm.wasm');
+    || path.join(__dirname, '..', 'node_modules', 'sql.js', 'dist', 'sql-wasm.wasm');
   const wasmBinary = fs.readFileSync(wasmPath);
 const SQL = await initSqlJs({ wasmBinary });
 
@@ -811,7 +811,11 @@ const SQL = await initSqlJs({ wasmBinary });
 }
 
 if (require.main === module) {
+  if (require.main === module) {
   start().catch(console.error);
+} else {
+  module.exports = { start, app, PORT };
+}
 } else {
   module.exports = { start, app, PORT };
 }
