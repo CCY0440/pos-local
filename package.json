@@ -20,7 +20,8 @@
   },
   "devDependencies": {
     "electron": "^28.3.3",
-    "electron-builder": "^24.13.3"
+    "electron-builder": "^24.13.3",
+    "jimp": "^0.22.12"
   },
   "build": {
     "appId": "com.poslocal.restaurant",
@@ -37,16 +38,40 @@
       "!server/node_modules/**/*"
     ],
     "extraResources": [
-      { "from": "public", "to": "public" },
-      { "from": "node_modules/sql.js/dist/sql-wasm.wasm", "to": "sql-wasm.wasm" },
-      { "from": "build/icon.png", "to": "icon.png" }
+      {
+        "from": "public",
+        "to": "public"
+      },
+      {
+        "from": "node_modules/sql.js/dist/sql-wasm.wasm",
+        "to": "sql-wasm.wasm"
+      },
+      {
+        "from": "build/icon.png",
+        "to": "icon.png"
+      }
     ],
     "win": {
-      "target": [{ "target": "nsis", "arch": ["x64"] }],
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
       "icon": "build/icon.ico"
     },
     "mac": {
-      "target": [{ "target": "dmg", "arch": ["x64", "arm64"] }],
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
       "icon": "build/icon.icns",
       "category": "public.app-category.business"
     },
@@ -56,7 +81,9 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "POS點餐系統",
-      "installerLanguages": ["zh_TW"],
+      "installerLanguages": [
+        "zh_TW"
+      ],
       "language": "1028"
     },
     "dmg": {
