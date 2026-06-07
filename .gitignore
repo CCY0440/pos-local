@@ -1,7 +1,8 @@
-node_modules/
+﻿node_modules/
 server/data/
 *.db
 .env
 dist/
+build/icon.png
 build/icon.ico
 build/icon.icns
