@@ -1,151 +1,105 @@
-# POS 本地伺服器 — iSH 安裝說明
+# POS 點餐系統
 
-## 架構說明
+適合中小型餐廳使用的本地 QR Code 點餐系統。顧客掃描 QR Code 自助點餐，訂單即時顯示在後台。所有資料儲存在本機，不需要網路、不需要月費。
 
-```
-iPad 上的 iSH App
-├── Node.js + Express     ← 接收顧客訂單、提供菜單
-├── sql.js (純 JS SQLite) ← 儲存所有資料，不需要網路
-└── 你的前端 HTML         ← 直接從 iSH 提供給所有設備
+## 功能特色
 
-顧客手機 → 掃 QR Code → 連到 iPad 的 iSH server → 訂單存入 SQLite
-iPad Safari → 連到 iSH server → 後台管理介面
-```
-
----
-
-## 第一步：在 iPad 安裝 iSH
-
-App Store 搜尋「iSH Shell」，免費安裝。
+- 顧客掃 QR Code 用手機點餐，不需要下載 App
+- 訂單即時推送到後台（Server-Sent Events）
+- 支援多桌同時點餐
+- 菜單管理：新增 / 編輯 / 上傳圖片 / 上下架
+- 店家設定：Logo、店名、地址
+- 資料完全本地化，斷網也能運作
+- 系統匣常駐，不占用桌面
 
 ---
 
-## 第二步：在 iSH 安裝 Node.js
+## 下載安裝
 
-打開 iSH，依序執行：
+前往 [Releases 頁面](https://github.com/CCY0440/pos-local/releases) 下載最新版。
 
-```sh
-# 更新套件清單
-apk update
+| 平台 | 檔案 | 說明 |
+|------|------|------|
+| Windows 10/11 | `POS.Setup.x.x.x.exe` | 雙擊安裝，不需要 Node.js |
 
-# 安裝 Node.js 和 npm
-apk add nodejs npm
-
-# 確認版本（會比較慢，請耐心等待）
-node --version
-npm --version
-```
-
-> ⚠️ iSH 速度很慢，apk update 可能需要 3-5 分鐘，請耐心等待。
+安裝後桌面出現「POS點餐系統」捷徑，雙擊即可啟動。
 
 ---
 
-## 第三步：把專案傳到 iSH
+## 首次使用
 
-**方法 A：從電腦用 SCP 傳**
-
-在電腦執行：
-```bash
-# 先把專案壓縮
-cd /path/to/pos-local
-tar -czf pos-local.tar.gz .
-
-# 傳到 iPad（需要 iSH 的 SSH，或用其他方式）
-```
-
-**方法 B：直接在 iSH 用 wget 下載（如果有放到某個地方）**
-
-**方法 C（推薦 Demo 用）：直接在 iSH 裡建立檔案**
-
-```sh
-mkdir -p ~/pos/server/data/uploads/product-images
-mkdir -p ~/pos/server/data/uploads/store-logos
-mkdir -p ~/pos/public/js
-cd ~/pos/server
-```
-
-然後把 server.js 和 package.json 複製貼上到 iSH 的 nano 編輯器：
-```sh
-nano package.json   # 貼上 package.json 內容，Ctrl+X 儲存
-nano server.js      # 貼上 server.js 內容，Ctrl+X 儲存
-```
+1. 雙擊桌面捷徑啟動系統
+2. 右下角系統匣出現綠色圖示，瀏覽器自動開啟後台
+3. 點「註冊」建立管理員帳號
+4. 前往「店家設定」填寫店名、上傳 Logo
+5. 前往「菜單管理」新增品項
+6. 將顧客點餐頁面的 QR Code 列印或顯示在桌上
+7. 顧客掃碼點餐後，後台即時收到訂單通知
 
 ---
 
-## 第四步：安裝 npm 套件
+## 區網多設備共用
 
-```sh
-cd ~/pos/server
+同一 WiFi 下的手機、平板、其他電腦都可以存取：
+
+| 角色 | 網址 |
+|------|------|
+| 後台管理 | `http://電腦IP:3000/dashboard.html` |
+| 顧客點餐 | `http://電腦IP:3000` |
+
+啟動後系統匣圖示可以「複製區網網址」，直接傳給同事。
+
+---
+
+## 資料備份與還原
+
+**資料位置：**
+C:\Users\你的帳號\AppData\Roaming\pos-local\data
+├── restaurant.db ← 所有資料（帳號、菜單、訂單）
+└── uploads\ ← 上傳的圖片
+
+**備份方法：** 複製整個 `data\` 資料夾到安全的地方。
+**還原方法：** 把 `restaurant.db` 貼回相同路徑，重新啟動程式即可。
+---
+## 常見問題
+**Q：程式關掉了顧客還能點餐嗎？**
+不行。需要保持程式在系統匣執行，顧客才能存取。
+**Q：可以多台電腦同時跑後台嗎？**
+可以，只要連同一個 WiFi，用任何設備的瀏覽器開啟後台網址即可。資料集中在伺服器那台電腦上。
+**Q：資料會上傳到雲端嗎？**
+不會。所有資料只存在你的電腦，完全離線運作。
+**Q：Port 3000 被佔用怎麼辦？**
+設定環境變數 `PORT=3001` 後重新啟動，或在 PowerShell 執行：
+```powershell
+$env:PORT=3001; npm start
+開發者
+環境需求
+Node.js 18+
+Windows（打包 .exe）或 Mac（打包 .dmg）
+從原始碼執行
+git clone https://github.com/CCY0440/pos-local.git
+cd pos-local
+git checkout claude/adoring-curie-JeCTK
 npm install
-```
-
-> ⚠️ 這一步在 iSH 上可能需要 10-20 分鐘。
-> sql.js 是純 JS/WASM，不需要 native 編譯，但下載本身很慢。
-
-**這裡就是你要測試速度的關鍵點：**
-- 如果 npm install 超過 30 分鐘 → iSH 可能不適合
-- 如果在 10-20 分鐘內完成 → 繼續測試
-
----
-
-## 第五步：啟動伺服器
-
-```sh
-cd ~/pos/server
-node server.js
-```
-
-看到這個就代表成功：
-```
-🚀 POS 伺服器已啟動！
-   本機：  http://localhost:3000
-   區網：  http://192.168.x.x:3000
-```
-
----
-
-## 第六步：把前端檔案放到 public 資料夾
-
-把你所有的 HTML/JS/CSS 檔案放到 `~/pos/public/`，
-並把每個 HTML 檔案裡的：
-
-```html
-<!-- 原本 -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/config.js"></script>
-
-<!-- 換成 -->
-<script src="js/config.local.js"></script>
-<script src="js/supabase-shim.js"></script>
-```
-
----
-
-## 測試流程
-
-1. iPad iSH 啟動 `node server.js`
-2. 手機和 iPad 連同一個 WiFi 熱點
-3. 手機瀏覽器開啟 `http://[iPad的IP]:3000`
-4. 測試點餐流程
-5. iPad Safari 開啟後台 `http://localhost:3000/dashboard.html`
-6. 確認訂單是否即時出現
-
----
-
-## 速度判斷標準
-
-| 操作 | 可接受 | 太慢 |
-|------|--------|------|
-| npm install | < 20 分鐘 | > 30 分鐘 |
-| node server.js 啟動 | < 30 秒 | > 2 分鐘 |
-| 開啟菜單頁 | < 3 秒 | > 8 秒 |
-| 送出訂單 | < 2 秒 | > 5 秒 |
-| 訂單出現在後台 | < 3 秒 | > 8 秒 |
-
----
-
-## 如果 iSH 太慢的替代方案
-
-1. **Android 平板 + Termux** → 原生 Linux，速度正常
-2. **Raspberry Pi** → 小型電腦，永遠開著，最穩定
-3. **Windows 平板** → 跟一般電腦完全一樣
+npm start
+打包安裝檔
+node build/create-icon.js   # 產生圖示
+npm run build:win            # Windows .exe（需在 Windows 執行）
+npm run build:mac            # Mac .dmg（需在 Mac 執行）
+專案結構
+pos-local/
+├── main.js           # Electron 主程序（系統匣、單一實例）
+├── package.json      # 根目錄相依套件 + electron-builder 設定
+├── server/
+│   ├── server.js     # Express API + sql.js 資料庫
+│   └── package.json  # server 獨立執行時的設定
+├── public/           # 前端 HTML / JS / CSS
+└── build/
+    └── create-icon.js  # 純 Node.js 圖示產生器
+環境變數
+變數	說明	預設
+PORT	伺服器 Port	3000
+POS_DATA_DIR	資料根目錄（Electron 自動設定）	server/data/
+POS_PUBLIC_DIR	前端靜態資源目錄	public/
+POS_WASM_PATH	sql-wasm.wasm 路徑（Electron 自動設定）	自動偵測
+貼到 GitHub 編輯器後點 **Commit changes** 即完成。
